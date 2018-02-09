@@ -1,8 +1,10 @@
 library(gdata)
 library(readr)
-source('~/scope4r/rscripts/fun/make_setoptions.r')
-source('~/scope4r/rscripts/fun/make_inputdata.r')
-source('~/scope4r/rscripts/fun/read_output.r')
+library(R.matlab)
+source('~/scope4r/scopeR/fun/make_setoptions.r')
+source('~/scope4r/scopeR/fun/make_inputdata.r')
+source('~/scope4r/scopeR/fun/read_output.r')
+source('~/scope4r/scopeR/fun/make_filenames.r')
 allglobal <- function(){list2env(mget(ls(name = parent.frame()), envir = parent.frame()), envir = .GlobalEnv)}
 allglobal()
 #NOTE: working directory when scope is being run must be 
@@ -29,7 +31,7 @@ leaf_file       = 'Optipar2017_ProspectD.mat';
 atmos_file      = 'FLEX-S3_std.atm';
   
 #The following are only for the time series option!
-Dataset_dir = 'MET_time_series'; 
+Dataset_dir = 'WR_2015'; 
 t_file      = 't_.dat';
 year_file   = 'year_.dat';
 Rin_file    = 'Rin_.dat';
@@ -54,6 +56,9 @@ Cab_file   = '';
 #optional leaf inclination distribution file with 3 headerlines (see
 # example). It MUST be located in ../data/leafangles/
 LIDF_file  = ''
+
+#Make the file
+make_filenames()
 #--------------------------------------------------------------#
 
 
@@ -75,8 +80,8 @@ N13 = 0 	 #calc_rss_rbs		      0: use resistance rss and rbs as provided in inpu
 N14 = 1 	 #applTcorr		            correct Vcmax and rate constants for temperature in biochemical.m?
 N15 = 0 	 #verify		              verifiy the results (compare to saved 'standard' output) to test the code for the first time?
 N16 = 1 	 #saveheaders	        	  write header lines in output files?
-N17 = 1 	 #makeplots 	         	  plot the results?
-N18 = 2 	 #simulation		       0: individual runs. Specify one value for constant input, and an equal number (>1) of values for all input that varies between the runs.
+N17 = 0 	 #makeplots 	         	  plot the results?
+N18 = 1 	 #simulation		       0: individual runs. Specify one value for constant input, and an equal number (>1) of values for all input that varies between the runs.
 
 make_setoptions(N1,N2,N3,N4,N5,N6,N7,N8,N9,N10,N11,N12,N13,N14,N15,N16,N17,N18,N19)
 #--------------------------------------------------------------#
@@ -157,8 +162,8 @@ rbs	   = 10					#	s m-1	     soil boundary layer resistance
 rwc	   =0						# s m-1      within canopy layer resistance
 
 #timeseries (this option is only for time series)								
-startDOY = 145.0		# Julian day (decimal) of start of simulations
-endDOY	 = 150			# Julian day (decimal) of end of simulations
+startDOY = 1		# Julian day (decimal) of start of simulations
+endDOY	 = 365			# Julian day (decimal) of end of simulations
 LAT	     = 45.8		# decimal deg	Latitude
 LON	     = -122			# decimal deg	Longitude
 timezn 	 = -8				# hours	east of Greenwich
@@ -173,11 +178,11 @@ allglobal()
 make_inputdata()
 #--------------------------------------------------------------#
 
-
+writeMat(con = '~/junk/test4bharat.mat',aerodyn=aerodyn,fluxes=fluxes,matVersion = 5)
 
 
 #Read in the outputs!
-
+read_output()
 
 
 

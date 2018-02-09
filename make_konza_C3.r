@@ -1,6 +1,10 @@
 library(gdata)
-source('~/scope4r/rscripts/fun/make_setoptions.r')
-source('~/scope4r/rscripts/fun/make_inputdata.r')
+library(readr)
+library(R.matlab)
+source('~/scope4r/scopeR/fun/make_setoptions.r')
+source('~/scope4r/scopeR/fun/make_inputdata.r')
+source('~/scope4r/scopeR/fun/read_output.r')
+source('~/scope4r/scopeR/fun/make_filenames.r')
 allglobal <- function(){list2env(mget(ls(name = parent.frame()), envir = parent.frame()), envir = .GlobalEnv)}
 #NOTE: working directory when scope is being run must be 
 #~/mscripts/scope4r/SCOPE_v1.70/code/
@@ -33,6 +37,50 @@ N18 = 1 	 #simulation		       0: individual runs. Specify one value for constant
 
 #Build file
 make_setoptions(N1,N2,N3,N4,N5,N6,N7,N8,N9,N10,N11,N12,N13,N14,N15,N16,N17,N18,N19)
+#--------------------------------------------------------------#
+
+#Build filenames.m
+#--------------------------------------------------------------#
+#NOTE: This is a matlab M file. If you want to change this file
+#on successive iterations, you need to shut down matlab and restart it.
+#workspace. Matlab holds on to .m files once it reads them in.
+#Well, probably not, but you do need to clear out more than just the
+
+#The following three are always required,
+Simulation_Name	= 'C3';
+soil_file       = 'soilnew.txt';
+leaf_file       = 'Optipar2017_ProspectD.mat'; 
+atmos_file      = 'FLEX-S3_std.atm';
+
+#The following are only for the time series option!
+Dataset_dir = 'WR_2015'; 
+t_file      = 't_.dat';
+year_file   = 'year_.dat';
+Rin_file    = 'Rin_.dat';
+Rli_file    = 'Rli_.dat';
+p_file      = 'p_.dat';
+Ta_file     = 'Ta_.dat';
+ea_file     = 'ea_.dat';
+u_file      = 'u_.dat';
+
+#optional (leave empty for constant values From inputdata.TXT)
+CO2_file = '';
+z_file  = '';
+tts_file  = '';
+
+#optional two column tables (first column DOY second column value)
+LAI_file   = '';
+hc_file    = '';
+SMC_file   = '';
+Vcmax_file = '';
+Cab_file   = '';
+
+#optional leaf inclination distribution file with 3 headerlines (see
+# example). It MUST be located in ../data/leafangles/
+LIDF_file  = ''
+
+#Make the file
+make_filenames()
 #--------------------------------------------------------------#
 
 
@@ -95,7 +143,7 @@ Rli	= 300						#W m-2         broadband incoming longwave radiation (2.5-50 um)
 p	  = 970						#hPa	         air pressure
 ea	= 15						#hPa	         atmospheric vapour pressure
 u	  = 2						  #ms-1	         wind speed at height z_
-Ca	= 380						#ppm        	 atmospheric CO2 concentration
+Ca	= 400						#ppm        	 atmospheric CO2 concentration
 Oa	= 209						#per mille	   atmospheric O2 concentration
 
 #Aerodynamic								
@@ -111,8 +159,8 @@ rbs	   = 10					#	s m-1	     soil boundary layer resistance
 rwc	   =0						# s m-1      within canopy layer resistance
 
 #timeseries (this option is only for time series)								
-startDOY = 169		# Julian day (decimal) of start of simulations
-endDOY	 = 170			# Julian day (decimal) of end of simulations
+startDOY = 150		# Julian day (decimal) of start of simulations
+endDOY	 = 200			# Julian day (decimal) of end of simulations
 LAT	     = -96.5		# decimal deg	Latitude
 LON	     = 39.15			# decimal deg	Longitude
 timezn 	 = 6				# hours	east of Greenwich

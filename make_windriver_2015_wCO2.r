@@ -6,13 +6,61 @@ source('~/scope4r/scopeR/fun/make_inputdata.r')
 source('~/scope4r/scopeR/fun/read_output.r')
 source('~/scope4r/scopeR/fun/make_filenames.r')
 allglobal <- function(){list2env(mget(ls(name = parent.frame()), envir = parent.frame()), envir = .GlobalEnv)}
+allglobal()
 #NOTE: working directory when scope is being run must be 
-#~/mscripts/scope4r/SCOPE_v1.70/code/
-
-#Similarly, 
+#~/scope4r/SCOPE_v1.70/code/
 
 #Path to main scope directory
 maindir = '~/scope4r/'
+
+#NOTE: ANYTHING IN HERE THAT CHANGES A .m FILE, YOU WILL HAVE TO RESTART MATLAB IF YOU CHANGE THAT .m FILE BEFORE THE CHANGES TO TAKE AFFECT. 
+#FOR SOME REASON, ONCE A .M FILE IS ASSOCIATED WITH MATLAB, IT DOESN'T MATTER IF YOU CLEAR THE WORKSPACE, THAT ORIGINAL .m IS ALL MATLAB WILL SEE. 
+
+
+#Build filenames.m
+#--------------------------------------------------------------#
+#NOTE: This is a matlab M file. If you want to change this file
+#on successive iterations, you need to shut down matlab and restart it.
+#workspace. Matlab holds on to .m files once it reads them in.
+#Well, probably not, but you do need to clear out more than just the
+
+#The following three are always required,
+Simulation_Name	= 'run';
+soil_file       = 'soilnew.txt';
+leaf_file       = 'Optipar2017_ProspectD.mat'; 
+atmos_file      = 'FLEX-S3_std.atm';
+  
+#The following are only for the time series option!
+Dataset_dir = 'WR_2015'; 
+t_file      = 't_.dat';
+year_file   = 'year_.dat';
+Rin_file    = 'Rin_.dat';
+Rli_file    = 'Rli_.dat';
+p_file      = 'p_.dat';
+Ta_file     = 'Ta_.dat';
+ea_file     = 'ea_.dat';
+u_file      = 'u_.dat';
+  
+#optional (leave empty for constant values From inputdata.TXT)
+CO2_file = 'CO2_.dat';
+z_file  = '';
+tts_file  = '';
+  
+#optional two column tables (first column DOY second column value)
+LAI_file   = '';
+hc_file    = '';
+SMC_file   = '';
+Vcmax_file = '';
+Cab_file   = '';
+  
+#optional leaf inclination distribution file with 3 headerlines (see
+# example). It MUST be located in ../data/leafangles/
+LIDF_file  = ''
+
+#Make the file
+make_filenames()
+#--------------------------------------------------------------#
+
 
 #BUILD OPTIONS FILE
 #--------------------------------------------------------------#
@@ -35,54 +83,8 @@ N16 = 1 	 #saveheaders	        	  write header lines in output files?
 N17 = 0 	 #makeplots 	         	  plot the results?
 N18 = 1 	 #simulation		       0: individual runs. Specify one value for constant input, and an equal number (>1) of values for all input that varies between the runs.
 
-#Build file
 make_setoptions(N1,N2,N3,N4,N5,N6,N7,N8,N9,N10,N11,N12,N13,N14,N15,N16,N17,N18,N19)
 #--------------------------------------------------------------#
-
-#Build filenames.m
-#--------------------------------------------------------------#
-#NOTE: This is a matlab M file. If you want to change this file
-#on successive iterations, you need to shut down matlab and restart it.
-#workspace. Matlab holds on to .m files once it reads them in.
-#Well, probably not, but you do need to clear out more than just the
-
-#The following three are always required,
-Simulation_Name	= 'C4';
-soil_file       = 'soilnew.txt';
-leaf_file       = 'Optipar2017_ProspectD.mat'; 
-atmos_file      = 'FLEX-S3_std.atm';
-
-#The following are only for the time series option!
-Dataset_dir = 'WR_2015'; 
-t_file      = 't_.dat';
-year_file   = 'year_.dat';
-Rin_file    = 'Rin_.dat';
-Rli_file    = 'Rli_.dat';
-p_file      = 'p_.dat';
-Ta_file     = 'Ta_.dat';
-ea_file     = 'ea_.dat';
-u_file      = 'u_.dat';
-
-#optional (leave empty for constant values From inputdata.TXT)
-CO2_file = '';
-z_file  = '';
-tts_file  = '';
-
-#optional two column tables (first column DOY second column value)
-LAI_file   = '';
-hc_file    = '';
-SMC_file   = '';
-Vcmax_file = '';
-Cab_file   = '';
-
-#optional leaf inclination distribution file with 3 headerlines (see
-# example). It MUST be located in ../data/leafangles/
-LIDF_file  = ''
-
-#Make the file
-make_filenames()
-#--------------------------------------------------------------#
-
 
 
 #BUILD INPUT FILE
@@ -100,9 +102,9 @@ tau_thermal	= 0.01				#             broadband thermal transmittance
 
 #Leaf_Biochemical								
 Vcmo       = 30						            #umol m-2 s-1	  maximum carboxylation capacity (at optimum temperature)
-m	         = 4							          #               Ball-Berry stomatal conductance parameter
+m	         = 8							          #               Ball-Berry stomatal conductance parameter
 BallBerry0 = 0.01                     #               Adam is not sure if this is real or not. It is not listed in assignvarnames.m. leave it be
-Type	     = 1							          #               Photochemical pathway: 0=C3, 1=C4
+Type	     = 0      						      #               Photochemical pathway: 0=C3, 1=C4
 kV	       = 0.6396					  		    #               extinction coefficient for Vcmax in the vertical (maximum at the top). 0 for uniform Vcmax
 Rdparam	   = 0.015							      #               Respiration = Rdparam*Vcmcax
 Tparam	   = c(0.2,0.3,281,308,328)   #		          	See PFT.xls. These are five parameters specifying the temperature response.
@@ -124,32 +126,32 @@ rs_thermal    = 0.06					#		             broadband soil reflectance in the therm
 cs            = 1.18E+03			# J kg-1 K-1     specific heat capacity of the soil
 rhos          = 1.80E+03			# kg m-3	       specific mass of the soil
 lambdas       = 1.55					# J m-1 K-1	     heat conductivity of the soil
-SMC           = 0.25					#                volumetric soil moisture content in the root zone
+SMC           = 25			   		#                volumetric soil moisture content in the root zone
 BSMBrightness	= 0.5						#                BSM model parameter for soil brightness
 BSMlat        = 25						#	               BSM model parameter 'lat'
 BSMlon        = 45						#	               BSM model parameter  'long'
 
 #Canopy								
-LAI	      = 3						# m2 m-2	Leaf area index
-hc	      = 2						# meter  	vegetation height
+LAI	      = 6						# m2 m-2	Leaf area index
+hc	      = 60						# meter  	vegetation height
 LIDFa	    = -0.35 			# 				leaf inclination
 LIDFb	    = -0.15				#   			variation in leaf inclination
 leafwidth =	0.1					#	meter	  leaf width
 
-#Meteo (values in data files, in the time series option, can overrule these values)								
-z	  = 10						#meter	       measurement height of meteorological data
-Rin	= 600						#W m-2	       broadband incoming shortwave radiation (0.4-2.5 um)
-Ta	= 20						#T             air temperature
-Rli	= 300						#W m-2         broadband incoming longwave radiation (2.5-50 um)
-p	  = 970						#hPa	         air pressure
-ea	= 15						#hPa	         atmospheric vapour pressure
-u	  = 2						  #ms-1	         wind speed at height z_
+#Meteo (values in data files, in the time series option, can overrule these values)			% May 25, noon at WR					
+z	  = 70						#meter	       measurement height of meteorological data
+Rin	= 950						#W m-2	       broadband incoming shortwave radiation (0.4-2.5 um)
+Ta	= 16						#T             air temperature
+Rli	= 314						#W m-2         broadband incoming longwave radiation (2.5-50 um)
+p	  = 965						#hPa	         air pressure
+ea	= 10.3						#hPa	         atmospheric vapour pressure
+u	  = 2.4						  #ms-1	         wind speed at height z_
 Ca	= 400						#ppm        	 atmospheric CO2 concentration
 Oa	= 209						#per mille	   atmospheric O2 concentration
 
 #Aerodynamic								
-zo	   = 0.246			# meter	     roughness length for momentum of the canopy
-d	     = 1.34				# meter	     displacement height
+zo	   = 9			# meter	     roughness length for momentum of the canopy
+d	     = 40				# meter	     displacement height
 Cd	   = 0.3				#            leaf drag coefficient
 rb	   = 10					# s m-1	     leaf boundary resistance
 CR	   = 0.35				#            Verhoef et al. (1997)  Drag coefficient for isolated tree 
@@ -160,14 +162,14 @@ rbs	   = 10					#	s m-1	     soil boundary layer resistance
 rwc	   =0						# s m-1      within canopy layer resistance
 
 #timeseries (this option is only for time series)								
-startDOY = 150		# Julian day (decimal) of start of simulations
-endDOY	 = 200			# Julian day (decimal) of end of simulations
-LAT	     = -96.5		# decimal deg	Latitude
-LON	     = 39.15			# decimal deg	Longitude
-timezn 	 = 6				# hours	east of Greenwich
+startDOY = 1		# Julian day (decimal) of start of simulations
+endDOY	 = 365			# Julian day (decimal) of end of simulations
+LAT	     = 45.8		# decimal deg	Latitude
+LON	     = -122			# decimal deg	Longitude
+timezn 	 = -8				# hours	east of Greenwich
 
 #Angles								
-tts	     = 30				# deg	      solar zenith angle
+tts	     = 60				# deg	      solar zenith angle
 tto	     = 0			  # deg	      observation zenith angle
 psi	     = 90			  # deg     	azimuthal difference between solar and observation angle
 
@@ -176,13 +178,17 @@ allglobal()
 make_inputdata()
 #--------------------------------------------------------------#
 
-
-#Read the outputs
-#--------------------------------------------------------------#
+#writeMat(con = '~/junk/test4bharat.mat',aerodyn=aerodyn,fluxes=fluxes,matVersion = 5)
 
 
+#Read in the outputs!
+#read_output()
 
 
 
 
-#--------------------------------------------------------------#
+
+
+
+
+

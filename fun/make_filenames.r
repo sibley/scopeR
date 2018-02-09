@@ -1,4 +1,4 @@
-make_set_parameter_filenames = function(){
+make_filenames = function(){
   
   out = paste('X = {',
               "'Simulation_Name','",Simulation_Name,"';",

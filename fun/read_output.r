@@ -1,16 +1,28 @@
-read_output = function(loc = '~/mscripts/scope4r/SCOPE_v1.70/output/'){
+read_output = function(loc = '~/scope4r/SCOPE_v1.70/output/',fullprovided = F){
 
 library(readr)
 
-#loc = '~/mscripts/scope4r/SCOPE_v1.70/output/standard_r_run_2018-01-25-1746/'
-#loc = '~/mscripts/scope4r/SCOPE_v1.70/output/'
-
-newloc = list.files(loc)
-fullpath = paste(loc,sort(newloc[which(substr(newloc,1,4) == 'run_')],decreasing=T)[1],'/',sep='')
-fullpath = '/home/yoga/home_package/C4_2018-01-31-0023/'
-
+#User has option to supply the full path to the dataset, or to allow the function to automatically detect the latest SCOPE output folder in /SCOPE_v1.70/output/. 
+#-------------------------------------#
+#If user supplied full path:
+if(fullprovided == T){fullpath = loc}
+  
+#If we are auto detecting most recent:
+if(fullprovided == F){
+  newloc = list.files(loc)
+  fullpath = paste(loc,sort(newloc[which(substr(newloc,1,4) == 'run_')],decreasing=T)[1],'/',sep='')
+}
+#-------------------------------------#
+  
 #File list
 flist = list.files(path = fullpath)
+
+#read in w.dat, which has header information for full spectrum radiation outputs - will be used later by functions.
+if(any(flist == 'wl.dat')){
+  wl <- read_table2(paste(fullpath,'wl.dat',sep=''),col_names = FALSE, skip = 2)
+  wl = wl[which(is.na(wl) == F)]
+  wl = paste('nm',wl,sep='')
+}
 
 #Function for the typical, 2 columns worth of header, all numerical columns type of output
 #-------------------------------------#
@@ -55,12 +67,6 @@ vertprof_whead = function(file,newvar){
 
 #RADSPEC - function to read in the output files with the full rad. spectrum
 #------------------------------------
-#read in header outside of the function
-if(any(flist == 'wl.dat')){
-  wl <- read_table2(paste(fullpath,'wl.dat',sep=''),col_names = FALSE, skip = 2)
-  wl = wl[which(is.na(wl) == F)]
-  wl = paste('nm',wl,sep='')
-  }
 radspec = function(file,newvar){
   if(any(flist == file)){
     dat <- read_table2(paste(fullpath,file,sep=''), col_names = FALSE, skip = 2)
@@ -144,7 +150,7 @@ if(any(flist == 'leaftemp.dat')){
 #-------------------------------------#
 if(any(flist == 'BOC_irradiance.dat')){
   BOC_irradiance <<- read_table2(paste(fullpath,'BOC_irradiance.dat',sep=''),col_names = FALSE, skip = 2)
-  colnames(BOC_irradance) = c(paste('shaded_',wl,sep=''),paste('ave_',wl,sep=''))
+  colnames(BOC_irradiance) = c(paste('shaded_',wl,sep=''),paste('ave_',wl,sep=''))
 }
 #-------------------------------------#
 
