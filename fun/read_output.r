@@ -95,6 +95,7 @@ typical('fluxes.dat','fluxes')
 typical('surftemp.dat','surftemp')
 typical('aerodyn.dat','aerodyn')
 typical('radiation.dat','radiation')
+typical('pars_and_input.dat','pars_and_input')
 
 #Vertical profile files
 vertprof('layer_h.dat','layer_h')
